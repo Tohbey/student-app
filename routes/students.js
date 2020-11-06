@@ -1,17 +1,20 @@
 const express = require('express')
-const route = express.Router()
-const {Student,validate} = require('../models/student')
-const {Course, Courses} = require('../models/course')
+const router = express.Router()
+const Student = require('../models/student')
+const {Courses} = require('../models/course')
 const monogoose = require('mongoose')
-const { string } = require('joi')
 const chalk = require('chalk')
+const authorization = require('../middleware/auth')
+const student = require('../middleware/student')
+const admin = require('../middleware/admin')
 
-route.get('',async (req,res) => {
+
+router.get('',[authorization,student],async (req,res) => {
     const students = await Student.find().sort('name')
     res.status(200).json(students)
 })
 
-route.get('/:id',async (req,res) => {
+router.get('/:id',[authorization,student],async (req,res) => {
     const id = req.params.id
     
     const isValid = monogoose.Types.ObjectId.isValid(id)
@@ -26,7 +29,7 @@ route.get('/:id',async (req,res) => {
     res.send(student)
 })
 
-route.post('',async (req,res) => {
+router.post('',[authorization,student],async (req,res) => {
     const { error } = validate(req.body)
     if(error) return res.status(400).send(error.detail[0].message);
 
@@ -58,7 +61,7 @@ route.post('',async (req,res) => {
     }
 })
 
-route.put('/:id',async (req,res) => {
+router.put('/:id',[authorization,student],async (req,res) => {
     const id = req.params.id
     const student = await Student.findById(id);
     if(!student) return res.status(400).send('The student with the given ID was not found')
@@ -92,7 +95,7 @@ route.put('/:id',async (req,res) => {
 
 })
 
-route.delete('/:id',async (req,res) => {
+router.delete('/:id',[authorization,admin],async (req,res) => {
     const student = await Student.findByIdAndRemove(req.params.id)
 
     if(!student) return res.status(400).send('Student with the givien ID was not found')
@@ -101,4 +104,4 @@ route.delete('/:id',async (req,res) => {
 })
 
 
-module.exports = route;
+module.exports = router;

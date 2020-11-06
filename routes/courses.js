@@ -1,15 +1,15 @@
 const express = require('express')
-const route = express.Router()
+const router = express.Router()
 const { Courses} = require('../models/course')
 const monogoose = require('mongoose')
 const chalk = require('chalk')
 
-route.get('',async (req,res) => {
+router.get('',async (req,res) => {
     const courses = await Courses.find().sort('name')
     res.status(200).json(courses)
 })
 
-route.get('/:id',async (req,res) => {
+router.get('/:id',async (req,res) => {
     const id = req.params.id
     
     const isValid = monogoose.Types.ObjectId.isValid(id)
@@ -24,7 +24,7 @@ route.get('/:id',async (req,res) => {
     res.send(course)
 })
 
-route.post('',async (req,res) => {
+router.post('',async (req,res) => {
     let course = new Courses({
         courseCode: req.body.courseCode,
         courseTitle: req.body.courseTitle,
@@ -42,7 +42,7 @@ route.post('',async (req,res) => {
 
 })
 
-route.put('/:id',async (req,res) => {
+router.put('/:id',async (req,res) => {
     
     const id = req.params.id
     const course = await Courses.findById(id);
@@ -63,7 +63,7 @@ route.put('/:id',async (req,res) => {
     }
 })
 
-route.delete('/:id',async (req,res) => {
+router.delete('/:id',async (req,res) => {
     const course = await Courses.findByIdAndRemove(req.params.id)
 
     if(!course) return res.status(400).send('The course with the given ID was not found')
@@ -71,4 +71,4 @@ route.delete('/:id',async (req,res) => {
     res.send(course)
 })
 
-module.exports = route;
+module.exports = router;
