@@ -7,6 +7,8 @@ const _ = require('lodash')
 const bcrypt = require('bcrypt')
 const authorization = require('../middleware/auth')
 const admin = require('../middleware/admin')
+const config = require('config');
+
 
 router.get('',[authorization,admin],async (req,res) => {
     const users = await User.find();
